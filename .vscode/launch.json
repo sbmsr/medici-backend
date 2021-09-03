@@ -1,0 +1,10 @@
+{
+  "configurations": [
+    {
+      "command": "TS_NODE_TRANSPILE_ONLY=1 npx hardhat run scripts/call-greeter.ts",
+      "name": "Debug Script: Call Greeter",
+      "request": "launch",
+      "type": "node-terminal"
+    }
+  ]
+}
