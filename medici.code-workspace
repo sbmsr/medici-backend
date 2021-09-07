@@ -1,0 +1,14 @@
+{
+  "folders": [
+	{
+		"path": "."
+	},
+	{
+		"path": "../backend-old"
+	},
+	{
+		"path": "../web"
+	}
+],
+  "settings": {}
+}
