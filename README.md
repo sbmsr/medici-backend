@@ -1,6 +1,3 @@
-# hardhat-upgradeable-ts-template
+# medici-backend
 
-This is a template containing a hardhat project with
-  - TS enabled
-  - vscode debugger config
-  - open zeppelin upgradeable contracts
+web3 backend for an experiment in decentralized patronage.
