@@ -19,7 +19,7 @@ contract Medici is Initializable, OwnableUpgradeable{
 
     // Accept any incoming amount
     function attemptPurchase() external payable {
-        require(msg.value >= .01 ether, "Incorrect payment amount");
+        require(msg.value == .01 ether, "Incorrect payment amount");
         emit paymentSuccessful(msg.sender);
     }
     
