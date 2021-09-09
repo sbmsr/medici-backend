@@ -1,14 +1,11 @@
 {
   "folders": [
-	{
-		"path": "."
-	},
-	{
-		"path": "../backend-old"
-	},
-	{
-		"path": "../web"
-	}
-],
+    {
+      "path": "."
+    },
+    {
+      "path": "../web"
+    }
+  ],
   "settings": {}
 }

@@ -22,31 +22,35 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MediciInterface extends ethers.utils.Interface {
   functions: {
-    "attemptPurchase()": FunctionFragment;
+    "attemptPurchase(string[])": FunctionFragment;
     "blockNumber()": FunctionFragment;
-    "destroy()": FunctionFragment;
-    "initialize(uint256)": FunctionFragment;
+    "cashOut(uint256)": FunctionFragment;
+    "initialize(tuple[])": FunctionFragment;
+    "inventory(string)": FunctionFragment;
     "owner()": FunctionFragment;
-    "price()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "updateInventory(tuple[])": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "attemptPurchase",
-    values?: undefined
+    values: [string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "blockNumber",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "destroy", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: "cashOut",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [{ id: string; price: BigNumberish }[]]
+  ): string;
+  encodeFunctionData(functionFragment: "inventory", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "price", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -55,6 +59,10 @@ interface MediciInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "updateInventory",
+    values: [{ id: string; price: BigNumberish }[]]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "attemptPurchase",
@@ -64,10 +72,10 @@ interface MediciInterface extends ethers.utils.Interface {
     functionFragment: "blockNumber",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "destroy", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "cashOut", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "inventory", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -76,13 +84,19 @@ interface MediciInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateInventory",
+    data: BytesLike
+  ): Result;
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
-    "paymentSuccessful(address)": EventFragment;
+    "cashOutSuccessful(address,uint256)": EventFragment;
+    "paymentSuccessful(address,string[])": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "cashOutSuccessful"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "paymentSuccessful"): EventFragment;
 }
 
@@ -131,23 +145,28 @@ export class Medici extends BaseContract {
 
   functions: {
     attemptPurchase(
+      productIds: string[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     blockNumber(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    destroy(
+    cashOut(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     initialize(
-      p: BigNumberish,
+      products: { id: string; price: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
+    inventory(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { id: string; price: BigNumber }>;
 
-    price(overrides?: CallOverrides): Promise<[BigNumber]>;
+    owner(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -157,26 +176,36 @@ export class Medici extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    updateInventory(
+      products: { id: string; price: BigNumberish }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   attemptPurchase(
+    productIds: string[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   blockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
-  destroy(
+  cashOut(
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   initialize(
-    p: BigNumberish,
+    products: { id: string; price: BigNumberish }[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
+  inventory(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { id: string; price: BigNumber }>;
 
-  price(overrides?: CallOverrides): Promise<BigNumber>;
+  owner(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -187,23 +216,42 @@ export class Medici extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  updateInventory(
+    products: { id: string; price: BigNumberish }[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
-    attemptPurchase(overrides?: CallOverrides): Promise<void>;
+    attemptPurchase(
+      productIds: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     blockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
-    destroy(overrides?: CallOverrides): Promise<void>;
+    cashOut(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    initialize(p: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    initialize(
+      products: { id: string; price: BigNumberish }[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    inventory(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { id: string; price: BigNumber }>;
 
     owner(overrides?: CallOverrides): Promise<string>;
-
-    price(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     transferOwnership(
       newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateInventory(
+      products: { id: string; price: BigNumberish }[],
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -217,30 +265,41 @@ export class Medici extends BaseContract {
       { previousOwner: string; newOwner: string }
     >;
 
+    cashOutSuccessful(
+      to?: string | null,
+      amount?: null
+    ): TypedEventFilter<[string, BigNumber], { to: string; amount: BigNumber }>;
+
     paymentSuccessful(
-      undefined?: null
-    ): TypedEventFilter<[string], { arg0: string }>;
+      from?: string | null,
+      products?: null
+    ): TypedEventFilter<
+      [string, string[]],
+      { from: string; products: string[] }
+    >;
   };
 
   estimateGas: {
     attemptPurchase(
+      productIds: string[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     blockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
-    destroy(
+    cashOut(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     initialize(
-      p: BigNumberish,
+      products: { id: string; price: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
+    inventory(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    price(overrides?: CallOverrides): Promise<BigNumber>;
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -248,29 +307,39 @@ export class Medici extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateInventory(
+      products: { id: string; price: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     attemptPurchase(
+      productIds: string[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     blockNumber(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    destroy(
+    cashOut(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     initialize(
-      p: BigNumberish,
+      products: { id: string; price: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    inventory(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    price(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -278,6 +347,11 @@ export class Medici extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateInventory(
+      products: { id: string; price: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
