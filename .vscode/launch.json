@@ -1,8 +1,8 @@
 {
   "configurations": [
     {
-      "command": "TS_NODE_TRANSPILE_ONLY=1 npx hardhat run scripts/call-medici.ts",
-      "name": "Debug Script: Call Medici with Payment Amount",
+      "command": "TS_NODE_TRANSPILE_ONLY=1 npx hardhat run --network localhost scripts/list-medici-events.ts",
+      "name": "Debug Hardhat Script",
       "request": "launch",
       "type": "node-terminal"
     },

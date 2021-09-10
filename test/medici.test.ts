@@ -28,6 +28,13 @@ describe("Medici", function () {
     );
   });
 
+  it("should emit event on successful purchase", async function () {
+    let address = (await ethers.getSigners())[0].address;
+    await expect(Medici.attemptPurchase(["1"], { value: ethers.utils.parseUnits(".01", "ether") }))
+      .to.emit(Medici, "paymentSuccessful")
+      .withArgs(address, ["1"]);
+  });
+
   it("Should persist prices and owner on upgrade", async function () {
     fail("Needs to be implemented.");
   });

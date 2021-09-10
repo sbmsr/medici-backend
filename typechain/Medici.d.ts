@@ -271,11 +271,11 @@ export class Medici extends BaseContract {
     ): TypedEventFilter<[string, BigNumber], { to: string; amount: BigNumber }>;
 
     paymentSuccessful(
-      from?: string | null,
+      buyer?: string | null,
       products?: null
     ): TypedEventFilter<
       [string, string[]],
-      { from: string; products: string[] }
+      { buyer: string; products: string[] }
     >;
   };
 

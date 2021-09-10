@@ -23,7 +23,7 @@ contract Medici is Initializable, OwnableUpgradeable{
         }
     }
 
-    event paymentSuccessful(address indexed from, string[] products);
+    event paymentSuccessful(address indexed buyer, string[] products);
     event cashOutSuccessful(address indexed to, uint256 amount);
 
     function attemptPurchase(string[] memory productIds) external payable {
