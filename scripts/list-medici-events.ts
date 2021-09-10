@@ -19,9 +19,10 @@ async function main() {
   let formattedLogs = logs.map((log) => {
     let { args, name } = iface.parseLog(log);
     return {
-      event: name,
-      buyer: args.buyer,
-      products: args.products,
+      block: log.blockNumber as number,
+      event: name as string,
+      buyer: args.buyer as string,
+      products: args.products as string[],
     };
   });
 
