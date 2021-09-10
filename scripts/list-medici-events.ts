@@ -1,4 +1,3 @@
-import { providers } from "ethers";
 import hre, { ethers } from "hardhat";
 import { Medici } from "../typechain/index";
 
@@ -9,10 +8,10 @@ async function main() {
   )) as Medici;
 
   let fromAddress = (await hre.ethers.getSigners())[0].address;
-  let filter = Medici.filters.paymentSuccessful(fromAddress) as providers.Filter;
-  filter.fromBlock = (await Medici.blockNumber()).toNumber();
+  let filter = Medici.filters.paymentSuccessful(fromAddress);
+  let fromBlock = (await Medici.blockNumber()).toNumber();
 
-  var logs = await ethers.provider.getLogs(filter);
+  let logs = await Medici.queryFilter(filter, fromBlock);
 
   let { abi } = require("../artifacts/contracts/Medici.sol/Medici.json");
   let iface = new ethers.utils.Interface(abi);
