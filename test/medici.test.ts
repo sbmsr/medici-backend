@@ -35,6 +35,18 @@ describe("Medici", function () {
       .withArgs(address, ["1"]);
   });
 
+  it("should add new inventory successfully", async function () {
+    const newProduct = { id: "2", price: ethers.utils.parseUnits(".01", "ether") };
+    await Medici.updateInventory([newProduct]);
+    expect((await Medici.inventory(newProduct.id)).price).to.equal(newProduct.price);
+  });
+
+  it("should update existing inventory successfully", async function () {
+    const updatedProduct = { id: "1", price: ethers.utils.parseUnits(".02", "ether") };
+    await Medici.updateInventory([updatedProduct]);
+    expect((await Medici.inventory(updatedProduct.id)).price).to.equal(updatedProduct.price);
+  });
+
   it("Should persist prices and owner on upgrade", async function () {
     fail("Needs to be implemented.");
   });
